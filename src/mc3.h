@@ -56,9 +56,17 @@ extern void play_splash_animation(splash_manager* splash_mgr, int channel_id, in
 extern int translation_manager_ptr;
 extern int dword_61B1E0;
 
-splash_manager* get_splash_manager(void) {
-    ui_context  *ui = *(ui_context **)(dword_61B1E0 + 8);
-    hud_context *hud = *(hud_context **)((unsigned char *)ui + 112);
+//splash_manager* get_splash_manager(void) {
+//    ui_context  *ui = *(ui_context **)(dword_61B1E0 + 8);
+//    hud_context *hud = *(hud_context **)((unsigned char *)ui + 112);
+//
+//    return *(splash_manager **)((unsigned char *)hud + 80);
+//}
 
-    return *(splash_manager **)((unsigned char *)hud + 80);
+splash_manager* get_splash_manager(void) {
+    long long unk0;
+    long long unk1;
+    unk0 = *(long long*)(dword_61B1E0 + 8);
+    unk1 = *(long long*)(unk0 + 112);
+    return (splash_manager*)(*(long long)(v14+80));
 }
