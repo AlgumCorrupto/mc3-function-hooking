@@ -18,7 +18,7 @@ https://youtu.be/-N2QR7W1_kM?si=dWXQzRLOo9o4xrEb
     - Add its path to the PATH environment variable
     - Or install it using your favorite package manager
 
-## Running
+## Building
 
-Run ``make`` on the command-line
+Run ``make`` on the command-line inside the project's folder
 it should generate ``modded.iso`` if it ran successfully
