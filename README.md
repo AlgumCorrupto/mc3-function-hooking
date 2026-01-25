@@ -17,3 +17,8 @@ https://youtu.be/-N2QR7W1_kM?si=dWXQzRLOo9o4xrEb
 - armips: https://github.com/Kingcom/armips
     - Add its path to the PATH environment variable
     - Or install it using your favorite package manager
+
+## Running
+
+Run ``make`` on the command-line
+it should generate ``modded.iso`` if it ran successfully
