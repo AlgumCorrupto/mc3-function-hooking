@@ -14,7 +14,7 @@
 .definelabel translation_manager_ptr, 0x6BE860
 .definelabel dword_61B1E0, 0x61B1E0
 
-; writing the compiled C code
+; writing the compiled C code inside unused area of the executable
 .org 0x61C860
     .importobj "./hello.o"
 
