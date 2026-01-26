@@ -1,6 +1,6 @@
 ## Description
 
-This project is a proof of concept demonstrating that it is possible to inject C code
+This project is a proof of concept demostrating that it is possible to inject C code
 into Midnight Club 3 Remix.
 
 https://youtu.be/-N2QR7W1_kM?si=dWXQzRLOo9o4xrEb
