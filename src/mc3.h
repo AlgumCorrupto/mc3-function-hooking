@@ -61,32 +61,41 @@ typedef struct {
     u32 unknown3;
 } menu_item_widget;
 
+
+typedef void (*handler_t)(u64, i32);
+//typedef void (*click_handler_t)(u64);
 typedef struct {
     u32 unknown;
-    void (*handler_ptr)(u64);
+    handler_t handler;
 } menu_item_params;
 
 typedef struct {
     u32 owner;
     menu_item_params params;
     u32 action;
-    u32 type;
+    u32 unknown;
 } menu_item;
 
 typedef int ui_context;
 typedef int hud_context;
+typedef enum {
+    CLICK = 0,
+    IDK0  = 1,
+    CYCLE = 2,
+} menu_item_type;
 
 extern void flush_splash_channel(splash_manager* splash_mgr, u32 channel_id);
 extern translation_t get_translated_text(int* translation_mgr, char* key);
 extern void set_splash_channel_text(splash_manager* splash_mgr, u32 channel_id, const wchar* text);
 extern void play_splash_animation(splash_manager* splash_mgr, u32 channel_id, u32 unk_0, u32 unk_1);
 extern void create_menu_item(menu_item* item, menu_item_params params, u32 owner);
-extern void create_menu_item_warn(menu_item* item, menu_item_params params, u32 owner, u32 action, u32 flag);
+extern void create_menu_item_action(menu_item* item, menu_item_params params, u32 owner, u32 action, u32 flag);
 // i put 0 into unknown when calling this function
-extern menu_item_widget* add_menu_item(u32 menu_id, u32 position, u32 unknown, menu_item* item);
+extern menu_item_widget* add_menu_item(u32 menu_id, u32 position, menu_item_type type, menu_item* item);
 extern void resume(u64 unknown);
 // text is a utf-16 string
 extern void widget_string(u32 menu_id, menu_item_widget* item, u32 unknown, const wchar* text);
+extern u64 update_pause_menu(u64 unknown);
 extern u32 translation_manager_ptr;
 extern u32 dword_61B1E0; // used for the splash text
 extern u32 dword_617ADC; // used to get the pause menu context
@@ -105,6 +114,17 @@ u32* get_pause_menu_ctx() {
     return *(u32**)(dword_617ADC + 12);
 }
 
+// Or one-liner:
+
+typedef void (*widget_update_fn_t)(u32 self);
+void update_widget(u32 self) {
+    u32 vtable = *(u32 *)self;
+    widget_update_fn_t fn =
+        *(widget_update_fn_t *)(vtable + 228);
+
+    fn(self);
+
+}
 //typedef void (*unpause_fn_t)(u64 self, u64 arg);
 //void unpause(u64 code) {
 //    u32 obj_addr = unpause_function_base;
