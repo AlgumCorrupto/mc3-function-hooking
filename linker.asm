@@ -25,33 +25,51 @@
 .definelabel unpause_function_base, 0x619958
 .definelabel resume, 0x33b2f8
 .definelabel update_pause_menu, 0x3578a8
-
+.definelabel sprintf, 0x42f9f0
 
 c_code_addr equ 0x61C860 ; where the C code will be stored in the executable
-custom_button_offs  equ 0xa0
-custom_button_addr  equ c_code_addr + custom_button_offs
 
 ; writing the compiled C code inside unused area of the executable
 .org c_code_addr
-    .importobj "./mod.o"
+    .importlib "./mod.a"
 
 ; hijacking the control flow of the pause ui building
-.org 0x358D18
-    li  s4, 2 ; setting the acumulator to 1
-.org 0x358cac
-.definelabel normal_flow, 0x358CD4
-.definelabel dword_619D5C, 0x619D5C
-    jal custom_button_addr
-    nop
-    j normal_flow
+;.org 0x358D18
+;    li  s4, 2 ; setting the acumulator to 1
+;.org 0x358cac
+;.definelabel normal_flow, 0x358CD4
+;.definelabel dword_619D5C, 0x619D5C
+;    jal custom_button_addr
+;    nop
+;    j normal_flow
 
+; hijacking the translate text function to never make the text !!look like this!!
+.org 0x002BE5D0
+    j 0x002BE684
 
 ; hijacking the audio menu for testing
-.org 0x003844B8
-.definelabel loc_384540, 0x384540
-    jal custom_button_addr
+.org 0x3847d0
+    lw a0,0xa0(sp)
+    jal custom_button
     nop
-    j loc_384540
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
     nop
 
 .Close

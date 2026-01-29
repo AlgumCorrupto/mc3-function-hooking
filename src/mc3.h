@@ -11,7 +11,7 @@ typedef unsigned short      wchar;
 typedef struct {
    u32 unk04;
    u32 unk08;
-   char* text;
+   wchar* text;
 } translation_t;
 
 typedef struct {
@@ -62,7 +62,7 @@ typedef struct {
 } menu_item_widget;
 
 
-typedef void (*handler_t)(u64, i32);
+typedef void (*handler_t)(void*, i32);
 //typedef void (*click_handler_t)(u64);
 typedef struct {
     u32 unknown;
@@ -85,7 +85,7 @@ typedef enum {
 } menu_item_type;
 
 extern void flush_splash_channel(splash_manager* splash_mgr, u32 channel_id);
-extern translation_t get_translated_text(int* translation_mgr, char* key);
+extern translation_t get_translated_text(u32* translation_mgr, char* key);
 extern void set_splash_channel_text(splash_manager* splash_mgr, u32 channel_id, const wchar* text);
 extern void play_splash_animation(splash_manager* splash_mgr, u32 channel_id, u32 unk_0, u32 unk_1);
 extern void create_menu_item(menu_item* item, menu_item_params params, u32 owner);
@@ -100,8 +100,9 @@ extern u32 translation_manager_ptr;
 extern u32 dword_61B1E0; // used for the splash text
 extern u32 dword_617ADC; // used to get the pause menu context
 extern u64 unk_656664;
-extern u8  benchmark_flag;
+extern volatile u32 benchmark_flag;
 extern u32 unpause_function_base;
+extern int sprintf(char *buffer, const char *format, ...);
 
 splash_manager* get_splash_manager() {
     ui_context  *ui = *(ui_context **)(dword_61B1E0 + 8);
@@ -114,17 +115,17 @@ u32* get_pause_menu_ctx() {
     return *(u32**)(dword_617ADC + 12);
 }
 
-// Or one-liner:
+void update_widget(void* self) {
+    // param_1 points to an object
+    void **vptr = *(void **)self;
 
-typedef void (*widget_update_fn_t)(u32 self);
-void update_widget(u32 self) {
-    u32 vtable = *(u32 *)self;
-    widget_update_fn_t fn =
-        *(widget_update_fn_t *)(vtable + 228);
+    // load function pointer from vtable
+    void (*fn)(void *) = *(void (**)(void *))( (char*)vptr + 0xe4 );
 
+    // call it with `this`
     fn(self);
-
 }
+
 //typedef void (*unpause_fn_t)(u64 self, u64 arg);
 //void unpause(u64 code) {
 //    u32 obj_addr = unpause_function_base;

@@ -1,5 +1,7 @@
 mc3hello.o
 hello.o
+mod.o
+mod.a
 modded.iso
 default.iso
 data
