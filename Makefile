@@ -1,6 +1,6 @@
 CC = mips64r5900el-ps2-elf-gcc
 NM = mips64r5900el-ps2-elf-nm
-CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar
+CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf
 LDFLAGS = -nodefaultlibs
 AR = mips64r5900el-ps2-elf-ar
 

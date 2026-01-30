@@ -7,6 +7,7 @@ typedef signed int          i32;
 typedef signed short        i16;
 typedef signed char         i8;
 typedef unsigned short      wchar;
+typedef u32                 size_t;
 
 typedef struct {
    u32 unk04;
@@ -85,16 +86,18 @@ typedef enum {
 } menu_item_type;
 
 extern void flush_splash_channel(splash_manager* splash_mgr, u32 channel_id);
-extern translation_t get_translated_text(u32* translation_mgr, char* key);
+extern translation_t* get_translated_text(u32* translation_mgr, char* key);
 extern void set_splash_channel_text(splash_manager* splash_mgr, u32 channel_id, const wchar* text);
 extern void play_splash_animation(splash_manager* splash_mgr, u32 channel_id, u32 unk_0, u32 unk_1);
 extern void create_menu_item(menu_item* item, menu_item_params params, u32 owner);
 extern void create_menu_item_action(menu_item* item, menu_item_params params, u32 owner, u32 action, u32 flag);
 // i put 0 into unknown when calling this function
 extern menu_item_widget* add_menu_item(u32 menu_id, u32 position, menu_item_type type, menu_item* item);
-extern void resume(u64 unknown);
+extern void do_resume(void* unknown);
 // text is a utf-16 string
 extern void widget_string(u32 menu_id, menu_item_widget* item, u32 unknown, const wchar* text);
+extern void close_menu(void* context);
+
 extern u64 update_pause_menu(u64 unknown);
 extern u32 translation_manager_ptr;
 extern u32 dword_61B1E0; // used for the splash text
@@ -102,7 +105,13 @@ extern u32 dword_617ADC; // used to get the pause menu context
 extern u64 unk_656664;
 extern volatile u32 benchmark_flag;
 extern u32 unpause_function_base;
+extern volatile i32 cyclic_direction;
+// libc functions
 extern int sprintf(char *buffer, const char *format, ...);
+extern void *memset(void *s, int c, size_t n);
+extern void *memcpy(void *dest, const void *src, size_t n);
+extern int   memcmp(const void *s1, const void *s2, size_t n);
+
 
 splash_manager* get_splash_manager() {
     ui_context  *ui = *(ui_context **)(dword_61B1E0 + 8);
@@ -113,6 +122,11 @@ splash_manager* get_splash_manager() {
 
 u32* get_pause_menu_ctx() {
     return *(u32**)(dword_617ADC + 12);
+}
+
+void resume() {
+    u32* v0 = *(u32 **)(dword_617ADC + 12);
+    do_resume((void*)v0[3]);
 }
 
 void update_widget(void* self) {
@@ -126,16 +140,23 @@ void update_widget(void* self) {
     fn(self);
 }
 
-//typedef void (*unpause_fn_t)(u64 self, u64 arg);
-//void unpause(u64 code) {
-//    u32 obj_addr = unpause_function_base;
-//
-//    // read vtable pointer (32-bit)
-//    u32 vtable_addr = *(u32 *)obj_addr;
-//
-//    // get function pointer at offset +12
-//    unpause_fn_t fn = *(unpause_fn_t *)((char *)vtable_addr + 12);
-//
-//    // call it
-//    fn(obj_addr, 2);
-//}
+void str_to_wstr(const char* src, wchar* dest) {
+    while (*src) {
+        *dest++ = (wchar)(*src++);
+    }
+    *dest = 0; // null-terminate
+}
+
+typedef void (*unpause_fn_t)(u64 self, u64 arg);
+void unpause(u64 code) {
+    u32 obj_addr = unpause_function_base;
+
+    // read vtable pointer (32-bit)
+    u32 vtable_addr = *(u32 *)obj_addr;
+
+    // get function pointer at offset +12
+    unpause_fn_t fn = *(unpause_fn_t *)((char *)vtable_addr + 12);
+
+    // call it
+    fn(obj_addr, 2);
+}
