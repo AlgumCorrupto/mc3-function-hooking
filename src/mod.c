@@ -25,6 +25,7 @@ void debug_widget_handler(void* self, i32 direction) {
 
 void announce_cyclic_handler(void* self, i32 direction) {
     announce_code += direction;
+    announce_code %= 30;
     update_widget(self);
 }
 
