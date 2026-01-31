@@ -5,15 +5,19 @@ LDFLAGS = -nodefaultlibs
 AR = mips64r5900el-ps2-elf-ar
 
 
-all: modded.iso
+all: pnach
 
-modded.iso: data link
+pnach: pnach.asm mod.asm mod.a UNPACK_default.iso
+	armips pnach.asm
+	python3 ./armips2pnach.py
+
+iso: data link
 	ps2iso pack data/METADATA.json
 	mv data/OUTPUT.iso modded.iso
 
-link: data linker.asm mod.a
+link: data UNPACK_default.iso iso.asm mod.a mod.asm
 	chmod u+w ./data/FILES/slus_213.55
-	armips linker.asm
+	armips iso.asm
 	chmod u-w ./data/FILES/slus_213.55
 
 UNPACK_default.iso: default.iso

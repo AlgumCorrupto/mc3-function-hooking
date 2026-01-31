@@ -3,9 +3,6 @@
     See https://github.com/Kingcom/armips
 */
 
-.ps2
-.Open "./data/FILES/slus_213.55", 0x19FF80
-
 ; exporting symbols to be used by the C code
 ; some function pointers
 .definelabel flush_splash_channel, 0x002969B8
@@ -90,4 +87,3 @@ c_code_addr equ 0x61C860 ; where the C code will be stored in the executable
     nop
     nop
 
-.Close
