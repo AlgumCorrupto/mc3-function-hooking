@@ -22,3 +22,7 @@ https://youtu.be/-N2QR7W1_kM?si=dWXQzRLOo9o4xrEb
 
 Run ``make`` on the command-line inside the project's folder
 it should generate ``modded.iso`` if it ran successfully
+
+## Credits
+
+![Paulo-c3n](https://www.youtube.com/@Paulo-c3n)
