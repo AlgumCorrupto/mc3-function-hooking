@@ -28,7 +28,7 @@ pnach = [
 ]
 
 for change in changed:
-    pnach.append(f"patch=1,EE,{change[0]},byte,{change[1]}\n")
+    pnach.append(f"patch=3,EE,{change[0]},byte,{change[1]}\n")
 
 with open("60A42FF5.pnach", "w") as f:
     f.writelines(pnach)

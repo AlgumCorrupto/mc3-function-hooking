@@ -9,6 +9,6 @@ SLUS*
 ps2iso_linux
 UNPACK_default.iso
 research_stash
-patched.elf
+*.elf
 *.pnach
 
