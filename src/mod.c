@@ -1,4 +1,4 @@
-#include "mc3.h"
+#include <mc3.h>
 
 static u32 announce_code = 28;
 // Making a splash message that say hello!

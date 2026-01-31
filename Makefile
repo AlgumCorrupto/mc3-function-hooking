@@ -1,8 +1,10 @@
 CC = mips64r5900el-ps2-elf-gcc
 NM = mips64r5900el-ps2-elf-nm
-CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf
-LDFLAGS = -nodefaultlibs
+CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf -I./include/
 AR = mips64r5900el-ps2-elf-ar
+
+SRCS:=$(wildcard ./src/*.c)
+OBJS:= $(patsubst ./src/%.c,./obj/%.o,$(SRCS))
 
 all: pnach
 
@@ -26,11 +28,14 @@ data: UNPACK_default.iso
 	rm -rf data
 	cp -r UNPACK_default.iso data
 
-mod.o: ./src/mod.c ./src/mc3.h
-	$(CC) $(CFLAGS) $(LDFLAGS) -c ./src/mod.c -o mod.o
+./obj/%.o: ./src/%.c | ./obj
+	$(CC) $(CFLAGS) -c $< -o $@
 
-mod.a: mod.o
-	ar rcs mod.a mod.o
+./obj:
+	mkdir -p ./obj
+
+mod.a: $(OBJS)
+	$(AR) rcs $@ $^
 
 default.iso:
 	@echo "Error: default.iso not found!"
@@ -38,4 +43,4 @@ default.iso:
 
 .PHONY: clean
 clean:
-	rm -rf mod.o mod.a
+	rm -rf $(OBJDIR) mod.a
