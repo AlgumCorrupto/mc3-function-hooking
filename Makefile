@@ -4,7 +4,6 @@ CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -
 LDFLAGS = -nodefaultlibs
 AR = mips64r5900el-ps2-elf-ar
 
-
 all: pnach
 
 pnach: pnach.asm mod.asm mod.a UNPACK_default.iso
@@ -23,7 +22,6 @@ link: data UNPACK_default.iso iso.asm mod.a mod.asm
 UNPACK_default.iso: default.iso
 	ps2iso unpack default.iso
 
-.PHONY: data
 data: UNPACK_default.iso
 	rm -rf data
 	cp -r UNPACK_default.iso data
