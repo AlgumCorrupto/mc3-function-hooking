@@ -20,5 +20,6 @@ https://youtu.be/-N2QR7W1_kM?si=dWXQzRLOo9o4xrEb
 
 ## Building
 
-Run ``make`` on the command-line inside the project's folder
-it should generate ``modded.iso`` if it ran successfully
+- Run ``make`` on the command-line inside the project's folder
+it should generate a pnach if it ran successfully
+-  ``make iso`` to generate a modded iso
