@@ -1,6 +1,6 @@
 CC = mips64r5900el-ps2-elf-gcc
 NM = mips64r5900el-ps2-elf-nm
-CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf -I./include/
+CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf -I./include/ -mhard-float -O2 -G0
 AR = mips64r5900el-ps2-elf-ar
 
 SRCS:=$(wildcard ./src/*.c)
@@ -35,7 +35,9 @@ data: UNPACK_default.iso
 	mkdir -p ./obj
 
 mod.a: $(OBJS)
-	$(AR) rcs $@ $^
+	cd ./obj && ar x /usr/local/ps2dev/ee/lib/gcc/mips64r5900el-ps2-elf/15.2.0/libgcc.a
+	cd ..
+	$(AR) rcs $@ $^ ./obj/_unpack_sf.o ./obj/_make_df.o  ./obj/_sf_to_df.o  ./obj/_pack_df.o
 
 default.iso:
 	@echo "Error: default.iso not found!"

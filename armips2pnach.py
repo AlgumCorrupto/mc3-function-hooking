@@ -21,14 +21,14 @@ for i in range(size):
 pnach = [
     "gametitle=Midnight Club 3 - DUB Edition (NTSC-U) SLUS-21029 4A0E5B3A v1.0\n",
     "\n",
-    "[mc3hook]\n",
+    "[Digital speedometer (widescreen hud fix]\n",
     "author=AlgumCorrupto\n",
-    "description=Custom functionality for the game\n",
+    "description=Speedometer mod that works in the online mode!\n",
     "\n",
 ]
 
 for change in changed:
-    pnach.append(f"patch=3,EE,{change[0]},byte,{change[1]}\n")
+    pnach.append(f"patch=0,EE,{change[0]},byte,{change[1]}\n")
 
 with open("60A42FF5.pnach", "w") as f:
     f.writelines(pnach)

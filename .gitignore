@@ -11,4 +11,4 @@ UNPACK_default.iso
 research_stash
 *.elf
 *.pnach
-./obj/
+./obj/*

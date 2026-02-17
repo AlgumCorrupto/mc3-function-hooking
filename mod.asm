@@ -16,6 +16,8 @@
 .definelabel do_resume, 0x33b2f8
 .definelabel update_pause_menu, 0x3578a8
 .definelabel close_menu, 0x33b3e0
+.definelabel hudSpeedometer_render, 0x294838
+.definelabel debug_draw, 0x521d28
 
 ; some libc functions
 .definelabel sprintf, 0x42f9f0
@@ -40,7 +42,11 @@
 .definelabel benchmark_flag,  0x6F60B0
 .definelabel unpause_function_base, 0x619958
 .definelabel cyclic_direction, 0x6E0398
-c_code_addr equ 0x61C860 ; where the C code will be stored in the executable
+.definelabel DAT_0061443c, 0x0061443c
+.definelabel DAT_00619318, 0x00619318
+
+
+c_code_addr equ 0x61C880 ; where the C code will be stored in the executable
 
 ; writing the compiled C code inside unused area of the executable
 .org c_code_addr
@@ -87,3 +93,8 @@ c_code_addr equ 0x61C860 ; where the C code will be stored in the executable
     nop
     nop
 
+.org 0x00294C20
+    move a0, s3
+    jal render_speedo
+    nop
+    

@@ -97,8 +97,10 @@ extern void do_resume(void* unknown);
 // text is a utf-16 string
 extern void widget_string(u32 menu_id, menu_item_widget* item, u32 unknown, const wchar* text);
 extern void close_menu(void* context);
-
+extern void hudSpeedometer_render(void* this);
 extern u64 update_pause_menu(u64 unknown);
+extern void debug_draw(i32 x, i32 y, char* text, void* flags);
+
 extern u32 translation_manager_ptr;
 extern u32 dword_61B1E0; // used for the splash text
 extern u32 dword_617ADC; // used to get the pause menu context
@@ -106,6 +108,9 @@ extern u64 unk_656664;
 extern volatile u32 benchmark_flag;
 extern u32 unpause_function_base;
 extern volatile i32 cyclic_direction;
+extern i32 DAT_0061443c;
+extern i32 DAT_00619318;
+
 // libc functions
 extern int sprintf(char *buffer, const char *format, ...);
 extern void *memset(void *s, int c, size_t n);
