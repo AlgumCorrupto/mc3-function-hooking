@@ -1,4 +1,6 @@
+#include <types.h>
 #include <mc3.h>
+#include <sdk.h>
 
 static u32 announce_code = 28;
 // Making a splash message that say hello!
@@ -85,4 +87,25 @@ void custom_button(int menu_ctx) {
 
     wchar announce_text[] = L"Announce!";
     widget_string(pause_menu_ctx[60], do_announce_widget, 2, announce_text);
+}
+
+static char triangle_status = 0;
+
+void check_input()
+{
+    struct padButtonStatus status;
+    char last = triangle_status;
+
+    if (padRead(0, 0, &status))
+    {
+        u16 raw = status.btns;
+        u16 pressed = ~status.btns;
+        
+        if (pressed & PAD_TRIANGLE)
+            say_hello(1);
+        
+        //if (status.triangle_p > 0)
+        //    say_hello(2);
+
+    }
 }
