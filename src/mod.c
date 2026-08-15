@@ -2,26 +2,23 @@
 #include <mc3.h>
 #include <sdk.h>
 
-// skelly = a0 + 208
-// then skelly[1]
-// ts is the local transform
-
 typedef struct{
     float p[3];
 } Vec3;
 
 typedef struct {
-    // horizontal
-    // vertical
-    // depth
+    // horizontal, 0
+    // vertical, 1
+    // depth, 2
     Vec3 m[4];
 } Mat34;
 
 static float bpm = 135.f;
 
-float sqrt(float x) {
+static float sqrt(float x) {
     float result;
 
+    // i dont have access to stdlib, neither does game has a sqrt function
     __asm__ volatile (
         "sqrt.s %0, %1"
         : "=f"(result)
@@ -31,7 +28,19 @@ float sqrt(float x) {
     return result;
 }
 
-Vec3 squash_stretch(float amount) {
+
+static inline float ease_in_out(float t, float strength)
+{
+    // strength = 1: linear
+    // strength = 2: quadratic
+    // strength = 3: cubic
+    if (t < 0.5f)
+        return 0.5f * powf(2.f * t, strength);
+    else
+        return 1.f - 0.5f * powf(2.f * (1.f - t), strength);
+}
+
+static Vec3 squash_stretch(float amount) {
     // amount = 1.0 -> normal
     // amount < 1.0 -> squash vertically
     // amount > 1.0 -> stretch vertically
@@ -41,15 +50,17 @@ Vec3 squash_stretch(float amount) {
 }
 
 void bounce(char *a0) {
+
     u32 *skelly = *(u32 **)(a0 + 208);
     float *phase = (float *)(a0 + 212);
 
     if (!(*phase >= 0.f && *phase < 1.f))
         *phase = 0.f;
 
-    Mat34 *local = (Mat34 *)skelly[1]; // transformação local do chassi
+    Mat34 *local = (Mat34 *)skelly[1]; // the friggin local transform of the car
 
-    float delta = 1.f / 30.f;
+    float delta = 1.f / 30.f; // fuck your unstable framerates
+
     float frequency = bpm / 60.f;
 
     *phase += delta * frequency;
@@ -60,19 +71,16 @@ void bounce(char *a0) {
     float amount;
 
     if (*phase < 0.5f) {
-        // Squash: ease-in-out
         float t = *phase / 0.5f;
+        t = t * t * (3.f - 2.f * t); // DONT FUCKIGN WORRY ABOUT APPLYING EASE-IN-OUT 2 TIMES
+        t = ease_in_out(t, 3.0);
 
-        t = t * t * (3.f - 2.f * t);
-
-        amount = lerp_float(1.25f, 0.75f, t);
+        amount = lerp_float(1.15f, 0.85f, t);
     } else {
-        // Stretch: ease-in
         float t = (*phase - 0.5f) / 0.5f;
 
-        t = t * t * t;
-
-        amount = lerp_float(0.75f, 1.25f, t);
+        t = ease_in_out(t, 3.0);
+        amount = lerp_float(0.85f, 1.15f, t);
     }
 
     Vec3 scale = squash_stretch(amount);
