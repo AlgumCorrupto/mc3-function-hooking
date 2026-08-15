@@ -2,11 +2,11 @@ from typing import List, Tuple
 
 BASE_ADDR = 0x19FF80
 
-with open("./UNPACK_default.iso/FILES/slus_213.55", "rb") as f:
+with open("./original.elf", "rb") as f:
     orig = f.read()
     f.close()
 
-with open("patched.elf", "rb") as f:
+with open("./patched.elf", "rb") as f:
     patched = f.read()
     f.close()
 

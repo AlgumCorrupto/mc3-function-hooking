@@ -31,6 +31,10 @@
 .definelabel strncpy, 0x432e98
 .definelabel strcmp, 0x432f18
 .definelabel strcspn, 0x433160
+.definelabel sinf, 0x41c900
+.definelabel cosf, 0x41c7e0
+.definelabel lerp_float, 0x28a250
+.definelabel powf, 0x41cfa0
 
 ; some sdk functions
 .definelabel padRead, 0x543ed8
@@ -59,38 +63,9 @@ c_code_addr equ 0x61C860 ; where the C code will be stored in the executable
 ;    nop
 ;    j normal_flow
 
-; hijacking the translate text function to never make the text !!look like this!!
-.org 0x002BE5D0
-    j 0x002BE684
-
-; hooking a nullstub in the main event loop
-.org 0x0052D690
-    jal check_input
-
-; hijacking the audio menu for testing
-.org 0x3847d0
-    lw a0,0xa0(sp)
-    jal custom_button
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+.org 0x002FC968 // at 
+    jal bounce
+    daddu a0, s2, zero
     nop
     nop
 

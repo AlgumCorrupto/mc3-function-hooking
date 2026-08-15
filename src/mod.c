@@ -2,110 +2,82 @@
 #include <mc3.h>
 #include <sdk.h>
 
-static u32 announce_code = 28;
-// Making a splash message that say hello!
-void say_hello(u32 channel) {
-    // i'm calling them channels
-    char char_buffer[32];
-    sprintf(char_buffer, "Testing channel %d", channel);
-    // hacking get_translated_text to convert ascii text to utf-16 text
-    translation_t* channel_text = get_translated_text(&translation_manager_ptr, char_buffer);
-    // feel free to experiment changing CH to a different number
-    splash_manager* mgr = get_splash_manager();
-    flush_splash_channel(mgr, channel);
-    // utf-16 string
-    set_splash_channel_text(mgr, channel, channel_text->text);
-    play_splash_animation(mgr, channel, 0, 0);
+// skelly = a0 + 208
+// then skelly[1]
+// ts is the local transform
+
+typedef struct{
+    float p[3];
+} Vec3;
+
+typedef struct {
+    // horizontal
+    // vertical
+    // depth
+    Vec3 m[4];
+} Mat34;
+
+static float bpm = 135.f;
+
+float sqrt(float x) {
+    float result;
+
+    __asm__ volatile (
+        "sqrt.s %0, %1"
+        : "=f"(result)
+        : "f"(x)
+    );
+
+    return result;
 }
 
-// just toggles the debug displays
-void debug_widget_handler(void* self, i32 direction) {
-    benchmark_flag += direction;
-    benchmark_flag %= 3;
-    update_widget(self);
+Vec3 squash_stretch(float amount) {
+    // amount = 1.0 -> normal
+    // amount < 1.0 -> squash vertically
+    // amount > 1.0 -> stretch vertically
+
+    float horizontal = 1.f / sqrt(amount);
+    return (Vec3){{horizontal, amount, horizontal}};
 }
 
-void announce_cyclic_handler(void* self, i32 direction) {
-    announce_code += direction;
-    announce_code %= 30;
-    update_widget(self);
-}
+void bounce(char *a0) {
+    u32 *skelly = *(u32 **)(a0 + 208);
+    float *phase = (float *)(a0 + 212);
 
-void announce_handler(void* self, i32 unused) {
-    resume();
-    say_hello(announce_code);
-}
+    if (!(*phase >= 0.f && *phase < 1.f))
+        *phase = 0.f;
 
-void custom_button(int menu_ctx) {
-    u32* pause_menu_ctx = get_pause_menu_ctx();
+    Mat34 *local = (Mat34 *)skelly[1]; // transformação local do chassi
 
-    // debug cyclic
-    menu_item debug_item;
-    menu_item_widget* debug_widget;
+    float delta = 1.f / 30.f;
+    float frequency = bpm / 60.f;
 
-    menu_item_params params;
-    params.unknown = 0xFFFF0000;
-    params.handler = debug_widget_handler;
+    *phase += delta * frequency;
 
-    create_menu_item_action(&debug_item, params, menu_ctx, 1, 0);
-    debug_widget = add_menu_item(pause_menu_ctx[60], 4, CYCLE, &debug_item);
+    if (*phase >= 1.f)
+        *phase -= 1.f;
 
-    char char_buffer[32];
-    char debug_fmt[32] = "Debug: %d";
-    sprintf(char_buffer, debug_fmt, benchmark_flag);
-    // hacking get_translated_text to convert ascii text to utf-16 text
-    translation_t* debug_text = get_translated_text(&translation_manager_ptr, char_buffer);
+    float amount;
 
-    widget_string(pause_menu_ctx[60], debug_widget, 2, debug_text->text);
+    if (*phase < 0.5f) {
+        // Squash: ease-in-out
+        float t = *phase / 0.5f;
 
-    // announce cyclic
-    menu_item announce_cyclic;
-    menu_item_widget* announce_cyclic_widget;
+        t = t * t * (3.f - 2.f * t);
 
-    params.unknown = 0xFFFF0000;
-    params.handler = announce_cyclic_handler;
+        amount = lerp_float(1.25f, 0.75f, t);
+    } else {
+        // Stretch: ease-in
+        float t = (*phase - 0.5f) / 0.5f;
 
-    create_menu_item_action(&announce_cyclic, params, menu_ctx, 1, 0);
-    announce_cyclic_widget = add_menu_item(pause_menu_ctx[60], 5, CYCLE, &announce_cyclic);
+        t = t * t * t;
 
-    sprintf(char_buffer, "Announce code: %d", announce_code);
-
-    // hacking get_translated_text to convert ascii text to utf-16 text
-    translation_t* announce_cyclic_text = get_translated_text(&translation_manager_ptr, char_buffer);
-
-    widget_string(pause_menu_ctx[60], announce_cyclic_widget, 2, announce_cyclic_text->text);
-
-    // do announce button
-    menu_item do_announce;
-    menu_item_widget* do_announce_widget;
-
-    params.unknown = 0xFFFF0000;
-    params.handler = announce_handler;
-
-    create_menu_item(&do_announce, params, menu_ctx);
-    do_announce_widget = add_menu_item(pause_menu_ctx[60], 6, CLICK, &do_announce);
-
-    wchar announce_text[] = L"Announce!";
-    widget_string(pause_menu_ctx[60], do_announce_widget, 2, announce_text);
-}
-
-static char triangle_status = 0;
-
-void check_input()
-{
-    struct padButtonStatus status;
-    char last = triangle_status;
-
-    if (padRead(0, 0, &status))
-    {
-        u16 raw = status.btns;
-        u16 pressed = ~status.btns;
-        
-        if (pressed & PAD_TRIANGLE)
-            say_hello(1);
-        
-        //if (status.triangle_p > 0)
-        //    say_hello(2);
-
+        amount = lerp_float(0.75f, 1.25f, t);
     }
+
+    Vec3 scale = squash_stretch(amount);
+
+    local->m[0].p[0] = scale.p[0];
+    local->m[1].p[1] = scale.p[1];
+    local->m[2].p[2] = scale.p[2];
 }

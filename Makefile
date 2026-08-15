@@ -1,32 +1,16 @@
 CC = mips64r5900el-ps2-elf-gcc
 NM = mips64r5900el-ps2-elf-nm
-CFLAGS = -Wall -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf -I./include/
+CFLAGS = -Wall  -nostdlib -nostartfiles -ffreestanding -fshort-wchar -mabi=eabi -mno-abicalls -mlong32 -fno-builtin-printf -I./include/
 AR = mips64r5900el-ps2-elf-ar
 
 SRCS:=$(wildcard ./src/*.c)
-OBJS:= $(patsubst ./src/%.c,./obj/%.o,$(SRCS))
+OBJS:=$(patsubst ./src/%.c,./obj/%.o,$(SRCS))
 
 all: pnach
 
-pnach: pnach.asm mod.asm mod.a UNPACK_default.iso
+pnach: pnach.asm mod.asm mod.a original.elf
 	armips pnach.asm
 	python3 ./armips2pnach.py
-
-iso: data link
-	ps2iso pack data/METADATA.json
-	mv data/OUTPUT.iso modded.iso
-
-link: data UNPACK_default.iso iso.asm mod.a mod.asm
-	chmod u+w ./data/FILES/slus_213.55
-	armips iso.asm
-	chmod u-w ./data/FILES/slus_213.55
-
-UNPACK_default.iso: default.iso
-	ps2iso unpack default.iso
-
-data: UNPACK_default.iso
-	rm -rf data
-	cp -r UNPACK_default.iso data
 
 ./obj/%.o: ./src/%.c | ./obj
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -37,8 +21,8 @@ data: UNPACK_default.iso
 mod.a: $(OBJS)
 	$(AR) rcs $@ $^
 
-default.iso:
-	@echo "Error: default.iso not found!"
+original.elf:
+	@echo "Error: original.elf not found!"
 	@exit 1
 
 .PHONY: clean

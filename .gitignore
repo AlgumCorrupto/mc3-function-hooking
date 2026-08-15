@@ -12,3 +12,4 @@ research_stash
 *.elf
 *.pnach
 obj/*
+setup_hfs.sh

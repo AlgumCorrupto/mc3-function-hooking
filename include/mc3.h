@@ -105,6 +105,9 @@ extern void *memset(void *s, int c, size_t n);
 extern void *memcpy(void *dest, const void *src, size_t n);
 extern int   memcmp(const void *s1, const void *s2, size_t n);
 
+extern float sinf(float);
+extern float lerp_float(float, float, float);
+extern float powf(float, float);
 
 splash_manager* get_splash_manager() {
     ui_context  *ui = *(ui_context **)(dword_61B1E0 + 8);
