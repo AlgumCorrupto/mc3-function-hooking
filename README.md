@@ -25,4 +25,4 @@ it should generate ``modded.iso`` if it ran successfully
 
 ## Credits
 
-[AlgumCorrupto (rato.jpg)](https://www.youtube.com/@AlgumCorrupto)
+[AlgumCorrupto (rato.jpg)](https://www.youtube.com/@ratojpg)
